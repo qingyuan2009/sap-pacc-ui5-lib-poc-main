@@ -1,0 +1,41 @@
+{
+  "name": "@sap/sap-pacc-ui5-poc",
+  "version": "1.0.0",
+  "author": "SAP SE",
+  "description": "PACC lib poc",
+  "repository": {
+    "type": "git",
+    "url": "https://github.tools.sap/sap-health-poc/sap-pacc-ui5-lib-poc.git"
+  },
+  "keywords": [
+    "sapui5",
+    "ui5",
+    "fhir"
+  ],
+  "engines": {
+    "node": ">= 14",
+    "npm": ">= 7"
+  },
+  "devDependencies": {
+    "eslint": "^7.30.0",
+    "eslint-watch": "^7.0.0",
+    "karma": "^6.3.4",
+    "karma-chrome-launcher": "^3.1.0",
+    "karma-coverage": "^2.0.3",
+    "karma-junit-reporter": "^2.0.1",
+    "karma-ui5": "^2.3.4",
+    "karma-webdriver-launcher": "^1.0.8",
+    "@ui5/cli": "^2.11.3"
+  },
+  "scripts": {
+    "lint": "eslint src test",
+    "lint:watch": "esw . --watch",
+    "lint:watch:fix": "esw . --watch --fix",
+    "test": "karma start",
+    "serve:ui5": "ui5 serve"
+  },
+  "files": [
+    "src/sap/pacc/**",
+    "ui5.yaml"
+  ]
+}

@@ -1,0 +1,96 @@
+general:
+  buildTool: npm
+  cfApiEndpoint: https://api.cf.eu10.hana.ondemand.com
+  cfDomain: cfapps.eu10.hana.ondemand.com
+  jiraApiUrl: https://sapjira.wdf.sap.corp/rest/api/2
+  jiraServerUrl: https://sapjira.wdf.sap.corp
+  gitHttpsCredentialsId: 'blrteam4-serviceuser-pat'
+  githubTokenCredentialsId: 'blrteam4-serviceuser-token'
+  manualConfirmation: false
+  manualConfirmationTimeout: 72 # 3 days
+  productiveBranch: main
+  xMakeBuildQuality: Milestone 
+  githubApiUrl: 'https://github.tools.sap/api/v3'
+  githubServerUrl: 'https://github.tools.sap'
+  verbose: false
+
+stages:
+  'Pull-Request Voting':
+    sonarExecuteScan: false
+    dockerImage: buildkite/puppeteer:latest
+    karmaExecuteTests: false
+    dockerCommand: npm install && npm run lint && npm run test
+    dockerWorkspace: "/home/piper"
+    junit:
+      pattern: "**/target/karma/TEST-*.xml"
+      updateResults: true
+      allowEmptyResults: false
+      archive: true
+      active: true
+    cobertura:
+      pattern: "**/target/coverage/**/cobertura-coverage.xml"
+      onlyStableBuilds: true
+      allowEmptyResults: true
+      archive: true
+      active: true
+  'Central Build':
+    sonarExecuteScan: false
+    testsPublishResults: false
+    checksPublishResults: false
+  'Additional Unit Tests':
+    karmaExecuteTests: true
+    junit:
+      pattern: "**/target/karma/TEST-*.xml"
+      updateResults: true
+      allowEmptyResults: false
+      archive: true
+      active: true
+    cobertura:
+      pattern: "**/target/coverage/**/cobertura-coverage.xml"
+      onlyStableBuilds: true
+      allowEmptyResults: true
+      archive: true
+      active: true
+  'IPScan and PPMS':
+    sapCheckPPMSCompliance: false
+steps:
+  artifactPrepareVersion:
+    versioningType: cloud
+    includeCommitId: false
+  setupPipelineEnvironment:
+    gitHttpsUrl: 'https://github.tools.sap/sap-health-poc/sap-pacc-ui5-lib-poc.git'
+  executeBuild:
+    xMakeJobName: 'ght-${githubOrg}-${githubRepo}-SP-MS-common'
+    nextGenXMake: true
+    xMakeNovaCredentialsId: blrteam4_xmakeNova
+  executeOpenSourceDependencyScan: # https://github.wdf.sap.corp/pages/ContinuousDelivery/piper-doc/steps/executeOpenSourceDependencyScan/
+    buildTool: npm
+    executeVulasScan: false
+    whitesourceExecuteScan: false
+    executeNspScan: false
+    executeProtecodeScan: false
+    detectExecuteScan: false
+  karmaExecuteTests:
+    # override docker image
+    dockerImage: 'buildkite/puppeteer:latest'
+    # don't use selenium sidecar
+    sidecarImage: ''
+    sidecarName: ''
+    sidecarPullImage: false
+    dockerWorkspace: '/home/piper'
+    stashContent:
+      - 'opa5'
+    installCommand: 'npm install'
+    runCommand: 'npm run test'
+    failOnError: true
+  githubPublishRelease: # DO NOT MODIFY
+    addClosedIssues: true
+    addDeltaToLastRelease: true
+    commitish: main
+  sapCreateTraceabilityReport: # https://github.wdf.sap.corp/pages/ContinuousDelivery/piper-doc/steps/sapCreateTraceabilityReport/
+    deliveryMappingFile: delivery.mapping
+    requirementMappingFile: requirement.mapping
+  triggerXMakeRemoteJob: # DO NOT MODIFY
+    xMakeServer: xmake-nova
+  influxWriteData:
+    influxServer: jenkins

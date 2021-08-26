@@ -1,0 +1,85 @@
+module.exports = function (config) {
+	"use strict";
+	config.set({
+		captureTimeout: 210000,
+		browserDisconnectTolerance: 3,
+		browserDisconnectTimeout: 210000,
+		browserNoActivityTimeout: 210000,
+
+		// frameworks to use
+		// available frameworks: https://npmjs.org/browse/keyword/karma-adapter
+		frameworks: ["ui5"],
+
+
+		ui5: {
+			type: "library",
+			url: "https://sapui5.hana.ondemand.com/1.75.0/",
+			testpage: "test/testsuite.qunit.html"
+		},
+
+		// preprocess matching files before serving them to the browser
+		// available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
+		preprocessors: {
+			"src/**/!(library).js": ["coverage"]
+		},
+
+		coverageReporter: {
+			includeAllSources: true,
+			dir: "target/coverage",
+			reporters: [
+				{
+					type: "cobertura",
+					subdir: "cobertura",
+					file: "cobertura-coverage.xml"
+				},
+				{
+					type: "lcov",
+					subdir: "report"
+				}
+			],
+			check: {
+				global: {
+					lines: 97.96
+				}
+			}
+		},
+
+		junitReporter: {
+			outputDir: "target/karma",
+			outputFile: "TEST-qunit.xml",
+			useBrowserName: false
+		},
+
+		// test results reporter to use
+		// possible values: 'dots', 'progress'
+		// available reporters: https://npmjs.org/browse/keyword/karma-reporter
+		reporters: [
+			"progress",
+			"coverage",
+			"junit"
+		],
+
+		// level of logging
+		// possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
+		logLevel: config.LOG_INFO,
+
+		// level of browser logging
+		browserConsoleLogOptions: {
+			level: "warn"
+		},
+
+		// start these browsers
+		// available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
+		browsers: ["ChromeHeadlessNoSandbox"],
+		customLaunchers: {
+			ChromeHeadlessNoSandbox: {
+				base: "ChromeHeadless",
+				flags: ["--no-sandbox", "--window-size=1920,1080", "--disable-gpu", "--disable-dev-shm-usage"]
+			}
+		},
+
+		// Continuous Integration mode
+		// if true, Karma captures browsers, runs the tests and exits
+		singleRun: true
+	});
+};

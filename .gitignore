@@ -1,0 +1,8 @@
+
+.DS_Store
+node_modules/**
+package-lock.json
+dist/**
+sap-pacc-ui5-poc-1.0.0.tgz
+test-results/**
+target/**

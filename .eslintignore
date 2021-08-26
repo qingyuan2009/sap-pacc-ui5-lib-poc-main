@@ -1,0 +1,7 @@
+**/*.flow.js
+/dist
+test-results/**
+bin/**
+generated_docs/**
+lib/**
+scripts/**
